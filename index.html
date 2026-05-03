@@ -529,6 +529,45 @@
     .tech-point-text h4 { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
     .tech-point-text p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
 
+    /* ── Prototype Gallery ───────────────────────────── */
+    .prototype-grid {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 1.5rem;
+      align-items: stretch;
+      margin-top: 2.5rem;
+    }
+    .prototype-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      overflow: hidden;
+      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
+    }
+    .prototype-card.primary {
+      padding: 1.25rem;
+    }
+    .prototype-card img {
+      display: block;
+      width: 100%;
+      height: auto;
+      border-radius: 0.75rem;
+    }
+    .prototype-caption {
+      margin-top: 0.9rem;
+    }
+    .prototype-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+    .prototype-note {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
     /* ── Pricing ──────────────────────────────────────── */
     #pricing { background: var(--bg-subtle); }
     .pricing-grid {
@@ -736,6 +775,7 @@
       .features-grid { grid-template-columns: 1fr 1fr; }
       .impact-grid { grid-template-columns: 1fr 1fr; }
       .tech-layout { grid-template-columns: 1fr; gap: 2.5rem; }
+      .prototype-grid { grid-template-columns: 1fr; }
       .team-grid { grid-template-columns: 1fr 1fr; }
     }
     @media (max-width: 640px) {
@@ -1066,6 +1106,14 @@
         <span class="section-eyebrow">Roadmap</span>
         <h2 class="section-title">The groundwork is laid. Now we build.</h2>
       </div>
+      <div class="container">
+        <figure class="prototype-card primary">
+          <img src="images/full.svg" alt="VetAnaLog full-screen prototype preview" loading="lazy" />
+          <figcaption class="prototype-caption">
+            <div class="prototype-title">Full Prototype</div>
+            <div class="prototype-note">Desktop view of the main logging workflow, ready for pilot feedback.</div>
+          </figcaption>
+        </figure>
       <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:900px;margin:0 auto;" class="roadmap-grid">
         <div style="text-align:center;padding:2rem 1rem;">
           <div style="color:var(--teal);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;">Now</div>
