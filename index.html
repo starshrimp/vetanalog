@@ -1,1367 +1,1375 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VetAnaLog — Veterinary Anaesthesia, Reimagined</title>
-  <meta name="description" content="VetAnaLog replaces paper anaesthesia charts with AI-powered digital logging purpose-built for veterinary surgery. Two taps to log a medication. Vitals captured automatically." />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <style>
-    /* ── Reset & Base ─────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VetAnaLog — Redefining Veterinary Anaesthesia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,700;1,9..40,300&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0a1628;
+    --navy-mid: #112240;
+    --blue: #1a5fb4;
+    --blue-bright: #2979d4;
+    --teal: #1d9e75;
+    --teal-light: #4fcba0;
+    --white: #ffffff;
+    --off-white: #f4f6f9;
+    --gray-light: #e8edf4;
+    --gray-mid: #8fa0b8;
+    --text-dark: #0a1628;
+    --text-body: #2d3f57;
+  }
 
-    :root {
-      --bg:        #080d14;
-      --bg-card:   #0e1520;
-      --bg-subtle: #111827;
-      --border:    rgba(255,255,255,0.07);
-      --teal:      #22d3ee;
-      --teal-dark: #0891b2;
-      --teal-glow: rgba(34,211,238,0.15);
-      --white:     #f8fafc;
-      --muted:     #94a3b8;
-      --accent:    #0ea5e9;
-      --radius:    1rem;
-      --transition: 0.25s ease;
-    }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; }
+  html { scroll-behavior: smooth; }
 
-    body {
-      font-family: 'Inter', system-ui, sans-serif;
-      background: var(--bg);
-      color: var(--white);
-      line-height: 1.6;
-      overflow-x: hidden;
-    }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--white);
+    color: var(--text-body);
+    overflow-x: hidden;
+  }
 
-    /* ── Utility ──────────────────────────────────────── */
-    .container { max-width: 1140px; margin: 0 auto; padding: 0 1.5rem; }
-    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); }
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(10, 22, 40, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 0 5%;
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
 
-    /* ── Gradient helpers ─────────────────────────────── */
-    .gradient-text {
-      background: linear-gradient(135deg, var(--teal) 0%, var(--accent) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
+  .nav-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 22px;
+    color: var(--white);
+    letter-spacing: -0.5px;
+  }
 
-    /* ── Navigation ───────────────────────────────────── */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      padding: 1rem 0;
-      transition: background var(--transition), backdrop-filter var(--transition);
-    }
-    nav.scrolled {
-      background: rgba(8,13,20,0.85);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--border);
-    }
-    .nav-inner {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .nav-logo {
-      font-size: 1.25rem;
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      text-decoration: none;
-      color: var(--white);
-    }
-    .nav-logo span { color: var(--teal); }
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      list-style: none;
-    }
-    .nav-links a {
-      color: var(--muted);
-      text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color var(--transition);
-    }
-    .nav-links a:hover { color: var(--white); }
-    .nav-cta {
-      background: linear-gradient(135deg, var(--teal-dark), var(--accent));
-      color: var(--white) !important;
-      padding: 0.5rem 1.25rem;
-      border-radius: 0.5rem;
-      font-weight: 600 !important;
-    }
-    .nav-cta:hover { opacity: 0.9; }
-    .nav-mobile-btn {
-      display: none;
-      background: none;
-      border: none;
-      cursor: pointer;
-      padding: 0.25rem;
-    }
-    .nav-mobile-btn span {
-      display: block;
-      width: 24px; height: 2px;
-      background: var(--white);
-      margin: 5px 0;
-      border-radius: 2px;
-      transition: transform var(--transition), opacity var(--transition);
-    }
+  .nav-logo span { color: var(--teal-light); }
 
-    /* ── Hero ─────────────────────────────────────────── */
-    #hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      position: relative;
-      overflow: hidden;
-      padding: 8rem 0 6rem;
-    }
-    .hero-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 80% 60% at 50% 0%, rgba(34,211,238,0.08) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 80% 80%, rgba(14,165,233,0.06) 0%, transparent 60%);
-      pointer-events: none;
-    }
-    .hero-grid-lines {
-      position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
-      background-size: 60px 60px;
-      pointer-events: none;
-    }
-    .hero-content {
-      position: relative;
-      max-width: 780px;
-    }
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: rgba(34,211,238,0.1);
-      border: 1px solid rgba(34,211,238,0.25);
-      color: var(--teal);
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 0.35rem 0.9rem;
-      border-radius: 99px;
-      margin-bottom: 1.75rem;
-    }
-    .hero-badge::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: var(--teal);
-      animation: pulse 2s infinite;
-    }
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.3; }
-    }
-    .hero h1 {
-      font-size: clamp(2.8rem, 6vw, 5rem);
-      font-weight: 900;
-      line-height: 1.08;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.5rem;
-    }
-    .hero-sub {
-      font-size: clamp(1.05rem, 2vw, 1.25rem);
-      color: var(--muted);
-      max-width: 560px;
-      margin-bottom: 2.5rem;
-      line-height: 1.7;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      flex-wrap: wrap;
-    }
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: linear-gradient(135deg, var(--teal-dark) 0%, var(--accent) 100%);
-      color: var(--white);
-      font-weight: 700;
-      font-size: 1rem;
-      padding: 0.875rem 2rem;
-      border-radius: 0.625rem;
-      text-decoration: none;
-      border: none;
-      cursor: pointer;
-      transition: opacity var(--transition), transform var(--transition);
-      box-shadow: 0 0 30px rgba(34,211,238,0.25);
-    }
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
-    .btn-outline {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      background: transparent;
-      color: var(--white);
-      font-weight: 600;
-      font-size: 1rem;
-      padding: 0.875rem 2rem;
-      border-radius: 0.625rem;
-      text-decoration: none;
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: border-color var(--transition), background var(--transition), transform var(--transition);
-    }
-    .btn-outline:hover { border-color: var(--teal); background: var(--teal-glow); transform: translateY(-1px); }
-    .hero-stats {
-      display: flex;
-      gap: 3rem;
-      margin-top: 4rem;
-      flex-wrap: wrap;
-    }
-    .stat-num {
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-    }
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-top: 0.15rem;
-    }
+  .nav-links {
+    display: flex;
+    gap: 2rem;
+    list-style: none;
+    align-items: center;
+  }
 
+  .nav-links a {
+    color: rgba(255,255,255,0.7);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 400;
+    transition: color 0.2s;
+  }
 
-    /* ── Section commons ──────────────────────────────── */
-    section { padding: 6rem 0; }
-    .section-eyebrow {
-      display: inline-block;
-      color: var(--teal);
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      margin-bottom: 0.875rem;
-    }
-    .section-title {
-      font-size: clamp(1.8rem, 3.5vw, 2.75rem);
-      font-weight: 800;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      margin-bottom: 1.25rem;
-    }
-    .section-body {
-      font-size: 1.05rem;
-      color: var(--muted);
-      max-width: 600px;
-      line-height: 1.75;
-    }
-    .section-header { margin-bottom: 3.5rem; }
-    .section-header.centered { text-align: center; }
-    .section-header.centered .section-body { margin: 0 auto; }
+  .nav-links a:hover { color: var(--white); }
 
-    /* ── Divider ──────────────────────────────────────── */
-    .divider {
-      height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-    }
+  .nav-cta {
+    background: var(--teal);
+    color: var(--white) !important;
+    padding: 8px 20px;
+    border-radius: 6px;
+    font-weight: 500 !important;
+    transition: background 0.2s !important;
+  }
 
-    /* ── Problem section ──────────────────────────────── */
-    #problem { background: var(--bg-subtle); }
-    .problem-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 2rem;
-      margin-top: 1rem;
-    }
-    .problem-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      position: relative;
-      overflow: hidden;
-      transition: border-color var(--transition), transform var(--transition);
-    }
-    .problem-card:hover { border-color: rgba(34,211,238,0.3); transform: translateY(-3px); }
-    .problem-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--teal-dark), var(--accent));
-      opacity: 0;
-      transition: opacity var(--transition);
-    }
-    .problem-card:hover::before { opacity: 1; }
-    .problem-icon {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    .problem-card h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      margin-bottom: 0.625rem;
-    }
-    .problem-card p { font-size: 0.95rem; color: var(--muted); line-height: 1.7; }
+  .nav-cta:hover { background: var(--teal-light) !important; color: var(--navy) !important; }
 
-    /* ── Solution / Features ──────────────────────────── */
-    .features-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 1.5rem;
-    }
-    .feature-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      transition: border-color var(--transition), transform var(--transition), box-shadow var(--transition);
-    }
-    .feature-card:hover {
-      border-color: rgba(34,211,238,0.35);
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px rgba(34,211,238,0.08);
-    }
-    .feature-icon {
-      width: 48px; height: 48px;
-      border-radius: 0.75rem;
-      background: var(--teal-glow);
-      border: 1px solid rgba(34,211,238,0.25);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.4rem;
-      margin-bottom: 1.25rem;
-    }
-    .feature-card h3 {
-      font-size: 1.05rem;
-      font-weight: 700;
-      margin-bottom: 0.625rem;
-    }
-    .feature-card p { font-size: 0.9rem; color: var(--muted); line-height: 1.7; }
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    background: var(--navy);
+    display: flex;
+    align-items: center;
+    padding: 100px 5% 60px;
+    position: relative;
+    overflow: hidden;
+  }
 
-    /* ── How it works ─────────────────────────────────── */
-    #how-it-works { background: var(--bg-subtle); }
-    .steps-list {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-      position: relative;
-    }
-    .steps-list::before {
-      content: '';
-      position: absolute;
-      left: 23px;
-      top: 40px;
-      bottom: 40px;
-      width: 2px;
-      background: linear-gradient(to bottom, var(--teal-dark), var(--accent));
-      opacity: 0.3;
-    }
-    .step {
-      display: flex;
-      gap: 2rem;
-      align-items: flex-start;
-      padding: 2rem 0;
-    }
-    .step-num {
-      flex-shrink: 0;
-      width: 48px; height: 48px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, var(--teal-dark), var(--accent));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      font-size: 1rem;
-      color: var(--white);
-      box-shadow: 0 0 20px rgba(34,211,238,0.3);
-      position: relative;
-      z-index: 1;
-    }
-    .step-content h3 {
-      font-size: 1.15rem;
-      font-weight: 700;
-      margin-bottom: 0.5rem;
-    }
-    .step-content p { color: var(--muted); font-size: 0.95rem; line-height: 1.7; }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 700px; height: 700px;
+    background: radial-gradient(circle, rgba(29,158,117,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-    /* ── Impact / Numbers ─────────────────────────────── */
-    .impact-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 1.5rem;
-    }
-    .impact-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2rem;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-    }
-    .impact-card::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at center bottom, var(--teal-glow), transparent 70%);
-      pointer-events: none;
-    }
-    .impact-num {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 0.5rem;
-    }
-    .impact-label { font-size: 0.85rem; color: var(--muted); line-height: 1.5; }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: -100px; left: -100px;
+    width: 500px; height: 500px;
+    background: radial-gradient(circle, rgba(26,95,180,0.15) 0%, transparent 70%);
+    pointer-events: none;
+  }
 
-    /* ── Technology ───────────────────────────────────── */
-    .tech-layout {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-    .tech-visual {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem;
-      position: relative;
-      overflow: hidden;
-    }
-    .tech-visual::before {
-      content: '';
-      position: absolute;
-      top: -40%; left: -20%;
-      width: 80%;
-      height: 80%;
-      background: radial-gradient(ellipse, rgba(34,211,238,0.1), transparent 70%);
-      pointer-events: none;
-    }
-    .monitor-display {
-      background: #0a0f1a;
-      border: 1px solid rgba(34,211,238,0.2);
-      border-radius: 0.75rem;
-      padding: 1.5rem;
-      font-family: 'Courier New', monospace;
-      font-size: 0.8rem;
-    }
-    .monitor-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1.25rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 1px solid var(--border);
-    }
-    .monitor-title { color: var(--teal); font-weight: 700; font-size: 0.75rem; letter-spacing: 0.1em; }
-    .monitor-live {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      color: #4ade80;
-      font-size: 0.7rem;
-    }
-    .monitor-live::before {
-      content: '';
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #4ade80;
-      animation: pulse 1.5s infinite;
-    }
-    .vital-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0.5rem 0;
-      border-bottom: 1px solid rgba(255,255,255,0.04);
-    }
-    .vital-row:last-child { border-bottom: none; }
-    .vital-name { color: var(--muted); font-size: 0.75rem; }
-    .vital-val { font-weight: 700; font-size: 0.9rem; }
-    .vital-val.green { color: #4ade80; }
-    .vital-val.yellow { color: #fbbf24; }
-    .vital-val.blue { color: var(--teal); }
-    .tech-badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      margin-top: 1.5rem;
-    }
-    .tech-badge {
-      background: rgba(34,211,238,0.08);
-      border: 1px solid rgba(34,211,238,0.2);
-      color: var(--teal);
-      font-size: 0.78rem;
-      font-weight: 600;
-      padding: 0.35rem 0.875rem;
-      border-radius: 99px;
-    }
-    .tech-points { list-style: none; display: flex; flex-direction: column; gap: 1.25rem; }
-    .tech-point {
-      display: flex;
-      gap: 1rem;
-      align-items: flex-start;
-    }
-    .tech-point-icon {
-      flex-shrink: 0;
-      width: 36px; height: 36px;
-      border-radius: 0.5rem;
-      background: var(--teal-glow);
-      border: 1px solid rgba(34,211,238,0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      margin-top: 0.1rem;
-    }
-    .tech-point-text h4 { font-weight: 700; font-size: 1rem; margin-bottom: 0.25rem; }
-    .tech-point-text p { font-size: 0.9rem; color: var(--muted); line-height: 1.6; }
+  .hero-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+  }
 
-    /* ── Prototype Gallery ───────────────────────────── */
-    .prototype-grid {
-      display: grid;
-      grid-template-columns: 1.35fr 0.85fr;
-      gap: 1.5rem;
-      align-items: stretch;
-      margin-top: 2.5rem;
-    }
-    .prototype-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 1rem;
-      overflow: hidden;
-      box-shadow: 0 18px 50px rgba(0,0,0,0.18);
-    }
-    .prototype-card.primary {
-      padding: 1.25rem;
-    }
-    .prototype-card img {
-      display: block;
-      width: 100%;
-      height: auto;
-      border-radius: 0.75rem;
-    }
-    .prototype-caption {
-      margin-top: 0.9rem;
-    }
-    .prototype-title {
-      font-size: 0.98rem;
-      font-weight: 700;
-      margin-bottom: 0.2rem;
-    }
-    .prototype-note {
-      font-size: 0.85rem;
-      color: var(--muted);
-      line-height: 1.5;
-    }
+  .hero-label {
+    display: inline-block;
+    background: rgba(29,158,117,0.15);
+    border: 1px solid rgba(79,203,160,0.3);
+    color: var(--teal-light);
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 100px;
+    margin-bottom: 1.5rem;
+  }
 
-    /* ── Pricing ──────────────────────────────────────── */
-    #pricing { background: var(--bg-subtle); }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 2rem;
-      max-width: 820px;
-      margin: 0 auto;
-    }
-    .pricing-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem;
-      position: relative;
-      transition: transform var(--transition), box-shadow var(--transition);
-    }
-    .pricing-card:hover { transform: translateY(-4px); }
-    .pricing-card.featured {
-      border-color: var(--teal);
-      box-shadow: 0 0 40px rgba(34,211,238,0.12);
-    }
-    .featured-label {
-      position: absolute;
-      top: -14px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: linear-gradient(135deg, var(--teal-dark), var(--accent));
-      color: var(--white);
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      padding: 0.3rem 1rem;
-      border-radius: 99px;
-      white-space: nowrap;
-    }
-    .pricing-tier { font-size: 0.85rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 0.75rem; }
-    .pricing-price {
-      font-size: 2.5rem;
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 0.25rem;
-    }
-    .pricing-period { font-size: 0.85rem; color: var(--muted); margin-bottom: 0.5rem; }
-    .pricing-desc { font-size: 0.9rem; color: var(--muted); margin-bottom: 2rem; line-height: 1.6; }
-    .pricing-features { list-style: none; display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
-    .pricing-features li {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.625rem;
-      font-size: 0.9rem;
-    }
-    .pricing-features li::before {
-      content: '✓';
-      color: var(--teal);
-      font-weight: 700;
-      flex-shrink: 0;
-      margin-top: 0.05rem;
-    }
-    .pricing-note { font-size: 0.82rem; color: var(--muted); margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); }
+  .hero h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(36px, 4.5vw, 58px);
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 1.5rem;
+  }
 
-    /* ── Team ─────────────────────────────────────────── */
-    .team-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 2rem;
-    }
-    .team-card {
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2.5rem 2rem;
-      text-align: center;
-      transition: border-color var(--transition), transform var(--transition);
-    }
-    .team-card:hover { border-color: rgba(34,211,238,0.35); transform: translateY(-4px); }
-    .team-avatar {
-      width: 80px; height: 80px;
-      border-radius: 50%;
-      margin: 0 auto 1.25rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.75rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--teal-dark), var(--accent));
-      box-shadow: 0 0 24px rgba(34,211,238,0.25);
-    }
-    .team-name { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.25rem; }
-    .team-role { font-size: 0.85rem; color: var(--teal); font-weight: 600; margin-bottom: 0.875rem; }
-    .team-bio { font-size: 0.9rem; color: var(--muted); line-height: 1.65; }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--teal-light);
+  }
 
-    /* ── Partners / Pilots ────────────────────────────── */
-    .partners-row {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 3rem;
-      flex-wrap: wrap;
-    }
-    .partner-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 0.75rem;
-      padding: 1rem 1.75rem;
-      font-weight: 600;
-      font-size: 0.95rem;
-    }
-    .partner-icon { font-size: 1.5rem; }
-    .partner-sub { font-size: 0.78rem; color: var(--muted); font-weight: 400; display: block; }
+  .hero-sub {
+    font-size: 17px;
+    color: rgba(255,255,255,0.65);
+    line-height: 1.7;
+    margin-bottom: 2rem;
+    max-width: 480px;
+  }
 
-    /* ── CTA ──────────────────────────────────────────── */
-    #contact {
-      background: linear-gradient(135deg, rgba(8,145,178,0.12), rgba(14,165,233,0.08));
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-    }
-    .cta-inner {
-      text-align: center;
-      max-width: 640px;
-      margin: 0 auto;
-    }
-    .cta-inner h2 {
-      font-size: clamp(2rem, 4vw, 3rem);
-      font-weight: 900;
-      letter-spacing: -0.03em;
-      margin-bottom: 1.25rem;
-    }
-    .cta-inner p { font-size: 1.05rem; color: var(--muted); margin-bottom: 2.5rem; line-height: 1.7; }
-    .cta-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
-    .contact-email {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--teal);
-      font-weight: 600;
-      font-size: 1rem;
-      text-decoration: none;
-      transition: opacity var(--transition);
-    }
-    .contact-email:hover { opacity: 0.75; }
+  .hero-pun {
+    font-size: 14px;
+    color: rgba(255,255,255,0.4);
+    font-style: italic;
+    margin-bottom: 2.5rem;
+  }
 
-    /* ── Footer ───────────────────────────────────────── */
-    footer {
-      background: var(--bg);
-      border-top: 1px solid var(--border);
-      padding: 3rem 0 2rem;
-    }
-    .footer-inner {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 2rem;
-      flex-wrap: wrap;
-    }
-    .footer-logo {
-      font-size: 1.2rem;
-      font-weight: 800;
-      color: var(--white);
-      text-decoration: none;
-      letter-spacing: -0.02em;
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    .footer-logo span { color: var(--teal); }
-    .footer-tagline { font-size: 0.85rem; color: var(--muted); }
-    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; align-items: center; }
-    .footer-links a { color: var(--muted); text-decoration: none; font-size: 0.875rem; transition: color var(--transition); }
-    .footer-links a:hover { color: var(--white); }
-    .footer-copy {
-      margin-top: 2.5rem;
-      padding-top: 1.5rem;
-      border-top: 1px solid var(--border);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: var(--muted);
-    }
-    .footer-pilot {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-    }
-    .pill {
-      background: rgba(34,211,238,0.1);
-      color: var(--teal);
-      font-size: 0.72rem;
-      font-weight: 600;
-      padding: 0.2rem 0.6rem;
-      border-radius: 99px;
-    }
+  .hero-pun span { color: var(--teal-light); font-style: normal; font-weight: 500; }
 
-    /* ── Responsive ───────────────────────────────────── */
-    @media (max-width: 900px) {
-      .problem-grid { grid-template-columns: 1fr; }
-      .features-grid { grid-template-columns: 1fr 1fr; }
-      .impact-grid { grid-template-columns: 1fr 1fr; }
-      .tech-layout { grid-template-columns: 1fr; gap: 2.5rem; }
-      .prototype-grid { grid-template-columns: 1fr; }
-      .team-grid { grid-template-columns: 1fr 1fr; }
-    }
-    @media (max-width: 640px) {
-      .nav-links { display: none; }
-      .nav-mobile-btn { display: block; }
-      .nav-links.open {
-        display: flex;
-        flex-direction: column;
-        position: fixed;
-        inset: 0;
-        background: rgba(8,13,20,0.98);
-        align-items: center;
-        justify-content: center;
-        gap: 2rem;
-        font-size: 1.25rem;
-        z-index: 200;
-      }
-      .features-grid { grid-template-columns: 1fr; }
-      .impact-grid { grid-template-columns: 1fr 1fr; }
-      .pricing-grid { grid-template-columns: 1fr; }
-      .team-grid { grid-template-columns: 1fr; }
-      .footer-inner { flex-direction: column; }
-      .hero-stats { gap: 2rem; }
-      .steps-list::before { display: none; }
-    }
-  </style>
+  .btn-primary {
+    display: inline-block;
+    background: var(--teal);
+    color: var(--white);
+    padding: 14px 32px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+    transition: all 0.2s;
+    margin-right: 1rem;
+  }
+
+  .btn-primary:hover { background: var(--teal-light); color: var(--navy); transform: translateY(-1px); }
+
+  .btn-secondary {
+    display: inline-block;
+    color: rgba(255,255,255,0.7);
+    padding: 14px 0;
+    text-decoration: none;
+    font-weight: 400;
+    font-size: 15px;
+    border-bottom: 1px solid rgba(255,255,255,0.3);
+    transition: all 0.2s;
+  }
+
+  .btn-secondary:hover { color: var(--white); border-color: var(--white); }
+
+  .hero-image {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+  }
+
+  .hero-image img {
+    width: 100%;
+    max-width: 580px;
+    border-radius: 16px;
+    filter: drop-shadow(0 40px 80px rgba(0,0,0,0.5));
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-12px); }
+  }
+
+  .hero-badges {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2.5rem;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    padding: 8px 14px;
+    font-size: 13px;
+    color: rgba(255,255,255,0.7);
+  }
+
+  .badge-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--teal-light);
+    flex-shrink: 0;
+  }
+
+  .badge-dot.blue { background: var(--blue-bright); }
+
+  /* SECTIONS */
+  section { padding: 100px 5%; }
+
+  .section-inner {
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: clamp(28px, 3.5vw, 44px);
+    color: var(--text-dark);
+    line-height: 1.15;
+    letter-spacing: -0.5px;
+    margin-bottom: 1.5rem;
+  }
+
+  .section-body {
+    font-size: 17px;
+    color: var(--text-body);
+    line-height: 1.75;
+    max-width: 680px;
+  }
+
+  /* PROBLEM */
+  .problem { background: var(--off-white); }
+
+  .problem-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .problem-image img {
+    width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.12);
+  }
+
+  .problem-points {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .problem-point {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .problem-icon {
+    width: 44px; height: 44px;
+    border-radius: 10px;
+    background: rgba(26,95,180,0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .problem-point h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .problem-point p {
+    font-size: 14px;
+    color: var(--gray-mid);
+    line-height: 1.6;
+  }
+
+  .stat-callout {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 2rem;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 1.5rem;
+    text-align: center;
+  }
+
+  .stat-callout-item .number {
+    font-family: 'DM Serif Display', serif;
+    font-size: 36px;
+    color: var(--teal-light);
+    display: block;
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+
+  .stat-callout-item .label {
+    font-size: 12px;
+    color: rgba(255,255,255,0.5);
+    line-height: 1.4;
+  }
+
+  .stat-divider {
+    border-left: 1px solid rgba(255,255,255,0.1);
+  }
+
+  /* SOLUTION */
+  .solution-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: center;
+    margin-top: 3rem;
+  }
+
+  .solution-image img {
+    width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.15);
+  }
+
+  .feature-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .feature-item {
+    display: flex;
+    gap: 1rem;
+    align-items: flex-start;
+    padding: 1.25rem;
+    background: var(--off-white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-light);
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .feature-item:hover {
+    border-color: rgba(29,158,117,0.3);
+    box-shadow: 0 4px 20px rgba(29,158,117,0.08);
+  }
+
+  .feature-num {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: var(--teal);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    flex-shrink: 0;
+  }
+
+  .feature-item h3 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .feature-item p {
+    font-size: 14px;
+    color: var(--gray-mid);
+    line-height: 1.6;
+  }
+
+  .species-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    flex-wrap: wrap;
+  }
+
+  .species-tag {
+    background: var(--off-white);
+    border: 1px solid var(--gray-light);
+    border-radius: 100px;
+    padding: 6px 14px;
+    font-size: 13px;
+    color: var(--text-body);
+  }
+
+  /* HOW IT WORKS */
+  .how { background: var(--navy); }
+
+  .how .section-title { color: var(--white); }
+  .how .section-label { color: var(--teal-light); }
+  .how .section-body { color: rgba(255,255,255,0.6); }
+
+  .flow {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    margin-top: 3rem;
+    position: relative;
+  }
+
+  .flow::before {
+    content: '';
+    position: absolute;
+    top: 40px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--teal), var(--blue-bright));
+  }
+
+  .flow-step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 0 1rem;
+    position: relative;
+  }
+
+  .flow-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+    border: 2px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    margin-bottom: 1.25rem;
+    position: relative;
+    z-index: 1;
+    background: var(--navy-mid);
+  }
+
+  .flow-step h3 {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--white);
+    margin-bottom: 0.5rem;
+  }
+
+  .flow-step p {
+    font-size: 13px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.5;
+  }
+
+  .ge-note {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 13px;
+    color: rgba(255,255,255,0.35);
+    font-style: italic;
+  }
+
+  /* WHY IT MATTERS */
+  .matters { background: var(--off-white); }
+
+  .matters-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-top: 3rem;
+    align-items: start;
+  }
+
+  .matters-images {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+
+  .matters-images img {
+    width: 100%;
+    border-radius: 10px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+  }
+
+  .matters-stats {
+    background: var(--navy);
+    border-radius: 16px;
+    padding: 2rem;
+    margin-top: 1rem;
+  }
+
+  .matters-stats-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+
+  .matters-stats-row:last-child { border-bottom: none; }
+
+  .matters-stats-row .label {
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .matters-stats-row .value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--teal-light);
+  }
+
+  .matters-right {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .matters-point {
+    padding: 1.5rem;
+    background: var(--white);
+    border-radius: 12px;
+    border: 1px solid var(--gray-light);
+    border-left: 4px solid var(--teal);
+  }
+
+  .matters-point h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 6px;
+  }
+
+  .matters-point p {
+    font-size: 14px;
+    color: var(--gray-mid);
+    line-height: 1.6;
+  }
+
+  /* MARKET */
+  .market { background: var(--white); }
+
+  .market-funnel {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    margin-top: 3rem;
+  }
+
+  .market-tier {
+    padding: 2rem;
+    border-radius: 16px;
+    text-align: center;
+    position: relative;
+  }
+
+  .market-tier.tam { background: var(--navy); }
+  .market-tier.sam { background: var(--navy-mid); }
+  .market-tier.som { background: linear-gradient(135deg, #0f6e56, #1d9e75); }
+
+  .market-tier-label {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 0.75rem;
+  }
+
+  .market-tier-value {
+    font-family: 'DM Serif Display', serif;
+    font-size: 42px;
+    color: var(--white);
+    line-height: 1;
+    margin-bottom: 0.5rem;
+  }
+
+  .market-tier-desc {
+    font-size: 13px;
+    color: rgba(255,255,255,0.55);
+    line-height: 1.5;
+  }
+
+  .market-cagr {
+    text-align: center;
+    margin-top: 2rem;
+    font-size: 14px;
+    color: var(--gray-mid);
+  }
+
+  .market-cagr strong { color: var(--teal); }
+
+  /* PRICING */
+  .pricing { background: var(--off-white); }
+
+  .pricing-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2rem;
+    margin-top: 3rem;
+    max-width: 800px;
+  }
+
+  .pricing-card {
+    background: var(--white);
+    border-radius: 16px;
+    padding: 2rem;
+    border: 1px solid var(--gray-light);
+    transition: box-shadow 0.2s;
+  }
+
+  .pricing-card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.08); }
+
+  .pricing-card.featured {
+    border-color: var(--teal);
+    border-width: 2px;
+    position: relative;
+  }
+
+  .pricing-badge {
+    position: absolute;
+    top: -12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--teal);
+    color: white;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 4px 14px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+
+  .pricing-tier {
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--teal);
+    margin-bottom: 0.5rem;
+  }
+
+  .pricing-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 24px;
+    color: var(--text-dark);
+    margin-bottom: 0.25rem;
+  }
+
+  .pricing-target {
+    font-size: 13px;
+    color: var(--gray-mid);
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  .pricing-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.6rem 0;
+    font-size: 14px;
+    border-bottom: 1px solid var(--gray-light);
+  }
+
+  .pricing-row:last-child { border-bottom: none; }
+
+  .pricing-row-label { color: var(--text-body); }
+
+  .pricing-row-value {
+    font-weight: 500;
+    color: var(--text-dark);
+  }
+
+  .pricing-row.addon .pricing-row-value { color: var(--teal); }
+
+  /* TEAM */
+  .team { background: var(--white); }
+
+  .team-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    margin-top: 3rem;
+  }
+
+  .team-card {
+    text-align: center;
+  }
+
+  .team-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 1rem;
+    display: block;
+    border: 3px solid var(--gray-light);
+    transition: border-color 0.2s;
+  }
+
+  .team-card:hover .team-photo { border-color: var(--teal); }
+
+  .team-card h3 {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dark);
+    margin-bottom: 4px;
+  }
+
+  .team-card .role {
+    font-size: 13px;
+    color: var(--teal);
+    font-weight: 500;
+    margin-bottom: 6px;
+  }
+
+  .team-card p {
+    font-size: 13px;
+    color: var(--gray-mid);
+    line-height: 1.5;
+  }
+
+  /* CONTACT */
+  .contact { background: var(--navy); }
+
+  .contact .section-title { color: var(--white); }
+  .contact .section-label { color: var(--teal-light); }
+
+  .contact-inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+    align-items: start;
+    margin-top: 3rem;
+  }
+
+  .contact-text {
+    font-size: 17px;
+    color: rgba(255,255,255,0.6);
+    line-height: 1.75;
+  }
+
+  .contact-info {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-info-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 14px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .contact-info-item a {
+    color: var(--teal-light);
+    text-decoration: none;
+  }
+
+  .contact-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .contact-form input,
+  .contact-form textarea {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--white);
+    outline: none;
+    transition: border-color 0.2s;
+    width: 100%;
+  }
+
+  .contact-form input::placeholder,
+  .contact-form textarea::placeholder { color: rgba(255,255,255,0.3); }
+
+  .contact-form input:focus,
+  .contact-form textarea:focus { border-color: var(--teal); }
+
+  .contact-form textarea { height: 120px; resize: vertical; }
+
+  .contact-form button {
+    background: var(--teal);
+    color: var(--white);
+    border: none;
+    padding: 14px 32px;
+    border-radius: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    align-self: flex-start;
+  }
+
+  .contact-form button:hover {
+    background: var(--teal-light);
+    color: var(--navy);
+    transform: translateY(-1px);
+  }
+
+  /* INNOSUISSE BADGE */
+  .inno-badge {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-top: 2rem;
+    font-size: 13px;
+    color: rgba(255,255,255,0.6);
+  }
+
+  .inno-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--teal-light);
+    flex-shrink: 0;
+  }
+
+  /* FOOTER */
+  footer {
+    background: #060e1c;
+    padding: 2rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .footer-logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .footer-logo span { color: var(--teal); }
+
+  .footer-copy {
+    font-size: 12px;
+    color: rgba(255,255,255,0.25);
+  }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .hero-content > * {
+    animation: fadeUp 0.7s ease both;
+  }
+
+  .hero-content > *:nth-child(1) { animation-delay: 0.1s; }
+  .hero-content > *:nth-child(2) { animation-delay: 0.2s; }
+  .hero-content > *:nth-child(3) { animation-delay: 0.3s; }
+  .hero-content > *:nth-child(4) { animation-delay: 0.4s; }
+  .hero-content > *:nth-child(5) { animation-delay: 0.5s; }
+  .hero-content > *:nth-child(6) { animation-delay: 0.6s; }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .hero-inner,
+    .problem-grid,
+    .solution-grid,
+    .matters-grid,
+    .contact-inner { grid-template-columns: 1fr; }
+
+    .flow { grid-template-columns: 1fr 1fr; gap: 2rem; }
+    .flow::before { display: none; }
+
+    .market-funnel { grid-template-columns: 1fr; }
+    .team-grid { grid-template-columns: 1fr 1fr; }
+    .pricing-grid { grid-template-columns: 1fr; }
+
+    .hero-image { order: -1; }
+    .stat-callout { grid-template-columns: 1fr; }
+    .stat-divider { border-left: none; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.5rem; }
+
+    nav { padding: 0 4%; }
+    .nav-links { gap: 1rem; }
+  }
+</style>
 </head>
 <body>
 
-  <!-- ── Navigation ─────────────────────────────────── -->
-  <nav id="nav">
-    <div class="container">
-      <div class="nav-inner">
-        <a class="nav-logo" href="#hero">Vet<span>Ana</span>Log</a>
-        <ul class="nav-links" id="nav-links">
-          <li><a href="#problem">Problem</a></li>
-          <li><a href="#solution">Solution</a></li>
-          <li><a href="#technology">Technology</a></li>
-          <li><a href="#pricing">Pricing</a></li>
-          <li><a href="#team">Team</a></li>
-          <li><a href="#contact" class="nav-cta">Get in Touch</a></li>
-        </ul>
-        <button class="nav-mobile-btn" id="mobile-btn" aria-label="Toggle navigation">
-          <span></span><span></span><span></span>
-        </button>
-      </div>
-    </div>
-  </nav>
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Vet<span>Ana</span>Log</div>
+  <ul class="nav-links">
+    <li><a href="#problem">Problem</a></li>
+    <li><a href="#solution">Solution</a></li>
+    <li><a href="#how">Technology</a></li>
+    <li><a href="#pricing">Pricing</a></li>
+    <li><a href="#team">Team</a></li>
+    <li><a href="#contact" class="nav-cta">Get Early Access</a></li>
+  </ul>
+</nav>
 
-  <!-- ── Hero ───────────────────────────────────────── -->
-  <section id="hero">
-    <div class="hero-bg"></div>
-    <div class="hero-grid-lines"></div>
-    <div class="container">
-      <div class="hero-content">
-        <div class="hero-badge">Veterinary Anaesthesia — Reimagined</div>
-        <h1>
-          Eyes on the<br>
-          <span class="gradient-text">patient.</span><br>
-          Not on paper.
-        </h1>
-        <p class="hero-sub">
-          VetAnaLog replaces paper anaesthesia charts with AI-powered digital logging
-          purpose-built for veterinary surgery — for every species, from horses to dogs to cats.
-        </p>
-        <div class="hero-actions">
-          <a href="#contact" class="btn-primary">
-            Request Early Access
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <a href="#solution" class="btn-outline">See How It Works</a>
+<!-- HERO -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <div class="hero-content">
+      <div class="hero-label">Veterinary Anaesthesia · Digital · AI</div>
+      <h1>Medicine runs on data.<br><em>Vet anaesthesia</em><br>still runs on paper.</h1>
+      <p class="hero-sub">VetAnaLog replaces manual paper protocols with automated real-time monitoring, two-tap logging, and AI-generated anaesthesia reports — for every species, every clinic.</p>
+      <p class="hero-pun">The name says it all. <span>We're replacing the analog.</span></p>
+      <div>
+        <a href="#contact" class="btn-primary">Get Early Access</a>
+        <a href="#solution" class="btn-secondary">See how it works →</a>
+      </div>
+      <div class="hero-badges">
+        <div class="badge">
+          <div class="badge-dot"></div>
+          Pilot: Tierspital Zürich
         </div>
-        <div class="hero-stats">
-          <div class="stat-item">
-            <div class="stat-num gradient-text">85%</div>
-            <div class="stat-label">Fewer manual records</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num gradient-text">130k</div>
-            <div class="stat-label">Records per year at<br>Tierspital Zürich alone</div>
-          </div>
-          <div class="stat-item">
-            <div class="stat-num gradient-text">180k</div>
-            <div class="stat-label">Anaesthesia-active<br>vet clinics worldwide</div>
-          </div>
+        <div class="badge">
+          <div class="badge-dot blue"></div>
+          Anaesthesia device integration
+        </div>
+        <div class="badge">
+          <div class="badge-dot"></div>
+          Innosuisse programme
         </div>
       </div>
     </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ── Problem ────────────────────────────────────── -->
-  <section id="problem">
-    <div class="container">
-      <div class="section-header">
-        <span class="section-eyebrow">The Problem</span>
-        <h2 class="section-title">Every five minutes.<br>Pen to paper. Mid-surgery.</h2>
-        <p class="section-body">
-          Veterinary anaesthesiologists are legally required to manually record vitals every
-          five minutes during surgery — a critical distraction at the worst possible moment.
-          When surgery ends, hours of transcription follow.
-        </p>
-      </div>
-      <div class="problem-grid">
-        <div class="problem-card">
-          <div class="problem-icon">📋</div>
-          <h3>Dangerous Distraction</h3>
-          <p>Every five minutes, attention is pulled from a high-risk patient to fill in a paper chart by hand. For a 500 kg horse under general anaesthesia, this is not acceptable.</p>
-        </div>
-        <div class="problem-card">
-          <div class="problem-icon">⏱️</div>
-          <h3>Hours of Transcription</h3>
-          <p>After surgery ends, vets face hours of manually transferring handwritten notes into digital systems. Data gets lost, errors creep in, and professionals burn out.</p>
-        </div>
-        <div class="problem-card">
-          <div class="problem-icon">📉</div>
-          <h3>Data Never Captured</h3>
-          <p>Handwritten records are fragmented and unstructured. The rich procedural data that could predict complications and improve outcomes is simply discarded.</p>
-        </div>
-        <div class="problem-card">
-          <div class="problem-icon">⚠️</div>
-          <h3>Legal Risk</h3>
-          <p>Incomplete or inaccurate anaesthesia documentation creates serious legal exposure. Paper charts are error-prone and hard to audit — the status quo is untenable.</p>
-        </div>
-      </div>
+    <div class="hero-image">
+      <img src="images/hero.png" alt="VetAnaLog app prototype showing live monitoring and medication logging screens">
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- PROBLEM -->
+<section class="problem" id="problem">
+  <div class="section-inner">
+    <div class="section-label">The Problem</div>
+    <h2 class="section-title">A critical distraction<br>at the worst moment</h2>
+    <p class="section-body">Every five minutes during surgery, a vet anaesthesiologist must stop, look away from the patient, and manually record vitals on paper. Then spend hours after surgery transcribing those notes into digital systems.</p>
 
-  <!-- ── Solution ───────────────────────────────────── -->
-  <section id="solution">
-    <div class="container">
-      <div class="section-header centered">
-        <span class="section-eyebrow">The Solution</span>
-        <h2 class="section-title">Built for the operating table.</h2>
-        <p class="section-body">
-          VetAnaLog is the only application purpose-built for veterinary anaesthesia logging.
-          Vitals flow in automatically. Medications are logged in two taps.
-          Reports write themselves.
-        </p>
+    <div class="problem-grid">
+      <div class="problem-image">
+        <img src="images/small_animal_vet.png" alt="Vet manually writing on paper protocol during surgery">
       </div>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-icon">🔌</div>
-          <h3>Automatic Vital Capture</h3>
-          <p>Direct integration with anaesthesia monitors — we're working with GE Healthcare. Every vital sign flows in automatically, continuously, with zero manual input.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">💊</div>
-          <h3>Two-Tap Medication Logging</h3>
-          <p>Log any drug, dose, or intervention in seconds without lifting your eyes from the patient. Built for the speed and focus demanded by live surgery.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🤖</div>
-          <h3>AI-Drafted Reports</h3>
-          <p>At the end of surgery, an LLM synthesises the entire procedure into a structured, legally sound anaesthesia report — ready to review, sign, and export.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🐴</div>
-          <h3>Every Species</h3>
-          <p>Horses, dogs, cats, exotic animals. VetAnaLog adapts to the clinical context of each species, supporting small practices and university hospitals alike.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">📊</div>
-          <h3>Structured Data Layer</h3>
-          <p>Every surgery is stored as structured, high-fidelity data — the foundation for the world's first predictive veterinary anaesthesia AI.</p>
-        </div>
-        <div class="feature-card">
-          <div class="feature-icon">🔒</div>
-          <h3>Airtight Documentation</h3>
-          <p>Zero transcription errors. Timestamped, audit-ready records that meet legal requirements and protect both the patient and the practitioner.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ── How It Works ───────────────────────────────── -->
-  <section id="how-it-works">
-    <div class="container">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:start;">
-        <div>
-          <span class="section-eyebrow">How It Works</span>
-          <h2 class="section-title">From monitor to report — automatically.</h2>
-          <p class="section-body">
-            VetAnaLog integrates directly into the surgical workflow without adding complexity.
-            Less friction. More focus. Better outcomes.
-          </p>
-        </div>
-        <div class="steps-list">
-          <div class="step">
-            <div class="step-num">1</div>
-            <div class="step-content">
-              <h3>Connect to the Monitor</h3>
-              <p>VetAnaLog connects directly to the anaesthesia monitor via the GE Healthcare integration. All vitals stream in live — heart rate, SpO₂, ETCO₂, blood pressure, temperature.</p>
+      <div>
+        <div class="problem-points">
+          <div class="problem-point">
+            <div class="problem-icon">✍️</div>
+            <div>
+              <h3>Vitals recorded by hand every 5 minutes</h3>
+              <p>Legally required manual documentation forces eyes off the patient at critical moments.</p>
             </div>
           </div>
-          <div class="step">
-            <div class="step-num">2</div>
-            <div class="step-content">
-              <h3>Log Interventions in Two Taps</h3>
-              <p>Medications, fluids, and observations are recorded with minimal interaction. The interface is designed for gloved hands and split-second attention.</p>
+          <div class="problem-point">
+            <div class="problem-icon">⚠️</div>
+            <div>
+              <h3>Manual charting = critical distraction</h3>
+              <p>Attention split between patient safety and paperwork increases risk during high-stakes procedures.</p>
             </div>
           </div>
-          <div class="step">
-            <div class="step-num">3</div>
-            <div class="step-content">
-              <h3>AI Drafts the Report</h3>
-              <p>When surgery ends, the LLM synthesises everything into a complete, structured anaesthesia report in seconds. The vet reviews, signs, and exports.</p>
-            </div>
-          </div>
-          <div class="step">
-            <div class="step-num">4</div>
-            <div class="step-content">
-              <h3>Data Contributes to the Network</h3>
-              <p>With consent, anonymised surgical data joins the shared research network — building the world's first high-fidelity veterinary anaesthesia dataset.</p>
+          <div class="problem-point">
+            <div class="problem-icon">🕐</div>
+            <div>
+              <h3>Hours lost post-op to transcription</h3>
+              <p>Tired vets manually transfer paper notes into digital systems — data gets lost, burnout sets in.</p>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
 
-  <div class="divider"></div>
-
-  <!-- ── Impact Numbers ─────────────────────────────── -->
-  <section id="impact">
-    <div class="container">
-      <div class="section-header centered">
-        <span class="section-eyebrow">Impact &amp; Market</span>
-        <h2 class="section-title">The numbers speak for themselves.</h2>
-      </div>
-      <div class="impact-grid">
-        <div class="impact-card">
-          <div class="impact-num gradient-text">85%</div>
-          <div class="impact-label">Reduction in manual records at pilot sites</div>
-        </div>
-        <div class="impact-card">
-          <div class="impact-num gradient-text">130k</div>
-          <div class="impact-label">Manual records per year at Tierspital Zürich alone</div>
-        </div>
-        <div class="impact-card">
-          <div class="impact-num gradient-text">€1B+</div>
-          <div class="impact-label">Total addressable market, growing 6%+ annually</div>
-        </div>
-        <div class="impact-card">
-          <div class="impact-num gradient-text">€270M</div>
-          <div class="impact-label">Serviceable market across Europe and key regions</div>
+        <div class="stat-callout">
+          <div class="stat-callout-item">
+            <span class="number">4,650</span>
+            <span class="label">anaesthesias per year at Tierspital Zürich</span>
+          </div>
+          <div class="stat-callout-item stat-divider">
+            <span class="number">130k</span>
+            <span class="label">manual records written by hand annually</span>
+          </div>
+          <div class="stat-callout-item stat-divider">
+            <span class="number">85%</span>
+            <span class="label">reduction with VetAnaLog</span>
+          </div>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- SOLUTION -->
+<section class="solution" id="solution">
+  <div class="section-inner">
+    <div class="section-label">The Solution</div>
+    <h2 class="section-title">From bedside to report —<br>automatically</h2>
 
-  <!-- ── Technology ─────────────────────────────────── -->
-  <section id="technology">
-    <div class="container">
-      <div class="tech-layout">
-        <div>
-          <span class="section-eyebrow">Technology</span>
-          <h2 class="section-title">The engine behind the care.</h2>
-          <p class="section-body" style="margin-bottom:2rem;">
-            VetAnaLog is built on three interlocking pillars — real-time monitor integration,
-            AI-powered reporting, and a proprietary structured data layer that grows more
-            valuable with every surgery.
-          </p>
-          <ul class="tech-points">
-            <li class="tech-point">
-              <div class="tech-point-icon">🔌</div>
-              <div class="tech-point-text">
-                <h4>GE Healthcare Integration</h4>
-                <p>Interface analysis already underway. Direct monitor connectivity — not manual entry, not OCR, but a real-time data stream.</p>
-              </div>
-            </li>
-            <li class="tech-point">
-              <div class="tech-point-icon">🧠</div>
-              <div class="tech-point-text">
-                <h4>LLM-Powered Reporting</h4>
-                <p>The same large language model technology behind modern AI assistants, fine-tuned on veterinary anaesthesia to produce structured, sign-off-ready reports.</p>
-              </div>
-            </li>
-            <li class="tech-point">
-              <div class="tech-point-icon">📡</div>
-              <div class="tech-point-text">
-                <h4>Research Data Network</h4>
-                <p>Opt-in anonymised data sharing. The first high-fidelity veterinary anaesthesia dataset in the world — the foundation for predictive AI that doesn't exist yet.</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-        <div class="tech-visual">
-          <div class="monitor-display">
-            <div class="monitor-header">
-              <span class="monitor-title">VETANALOG MONITOR FEED</span>
-              <span class="monitor-live">LIVE</span>
+    <div class="solution-grid">
+      <div class="solution-image">
+        <img src="images/full.png" alt="VetAnaLog iPad app interface">
+      </div>
+      <div>
+        <div class="feature-list">
+          <div class="feature-item">
+            <div class="feature-num">1</div>
+            <div>
+              <h3>Automatic monitor integration</h3>
+              <p>Vitals captured directly from anaesthesia monitors. No manual entry, no missed data points.</p>
             </div>
-            <div class="vital-row"><span class="vital-name">Heart Rate (HR)</span><span class="vital-val green">42 bpm</span></div>
-            <div class="vital-row"><span class="vital-name">SpO₂</span><span class="vital-val green">98%</span></div>
-            <div class="vital-row"><span class="vital-name">ETCO₂</span><span class="vital-val blue">38 mmHg</span></div>
-            <div class="vital-row"><span class="vital-name">Systolic BP</span><span class="vital-val yellow">82 mmHg</span></div>
-            <div class="vital-row"><span class="vital-name">Temperature</span><span class="vital-val green">37.4 °C</span></div>
-            <div class="vital-row"><span class="vital-name">Isoflurane</span><span class="vital-val blue">1.8%</span></div>
-            <div class="vital-row"><span class="vital-name">Last log</span><span class="vital-val" style="color:var(--muted);font-size:0.78rem;">Butorphanol 0.02 mg/kg IV — 14:23</span></div>
           </div>
-          <div class="tech-badges">
-            <span class="tech-badge">GE Healthcare</span>
-            <span class="tech-badge">Real-time sync</span>
-            <span class="tech-badge">AI report</span>
-            <span class="tech-badge">Tierspital Zürich</span>
+          <div class="feature-item">
+            <div class="feature-num">2</div>
+            <div>
+              <h3>Two-tap event logging</h3>
+              <p>Log medications, events, and comments in seconds. Eyes stay on the patient — not the screen.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-num">3</div>
+            <div>
+              <h3>AI-generated anaesthesia report</h3>
+              <p>At the end of surgery, our LLM drafts a complete structured report. Review, sign, export.</p>
+            </div>
+          </div>
+          <div class="feature-item">
+            <div class="feature-num">4</div>
+            <div>
+              <h3>Structured data storage</h3>
+              <p>Every procedure stored as research-ready data — the foundation for predictive AI.</p>
+            </div>
+          </div>
+        </div>
+        <div class="species-row">
+          <span class="species-tag">🐴 Horses</span>
+          <span class="species-tag">🐕 Dogs</span>
+          <span class="species-tag">🐈 Cats</span>
+          <span class="species-tag">🐄 Cattle</span>
+          <span class="species-tag">🐑 Sheep</span>
+          <span class="species-tag">🐖 Pigs</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="how" id="how">
+  <div class="section-inner">
+    <div class="section-label">Technology</div>
+    <h2 class="section-title">Created for efficiency.<br>Built for a vision.</h2>
+    <p class="section-body">Saves time and cost today. Builds the first structured dataset for veterinary anaesthesia — the foundation for predictive AI that doesn't exist yet.</p>
+
+    <div class="flow">
+      <div class="flow-step">
+        <div class="flow-icon">🖥️</div>
+        <h3>Monitor Data</h3>
+        <p>Direct interface with anaesthesia hardware in real time</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">🧠</div>
+        <h3>LLM Synthesis</h3>
+        <p>AI processes all vitals, events, and medications</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">📄</div>
+        <h3>Auto-Report</h3>
+        <p>Structured report drafted instantly post-surgery</p>
+      </div>
+      <div class="flow-step">
+        <div class="flow-icon">🗄️</div>
+        <h3>Data Collection</h3>
+        <p>Every case stored for research and future ML models</p>
+      </div>
+    </div>
+    <p class="ge-note">Monitor integration developed in preparation</p>
+  </div>
+</section>
+
+<!-- WHY IT MATTERS -->
+<section class="matters" id="matters">
+  <div class="section-inner">
+    <div class="section-label">Why It Matters</div>
+    <h2 class="section-title">More than efficiency</h2>
+    <p class="section-body">VetAnaLog delivers on three levels — today, tomorrow, and for the future of veterinary medicine.</p>
+
+    <div class="matters-grid">
+      <div>
+        <div class="matters-images">
+          <img src="vet_paper.png" alt="Before: manual paper charting">
+          <img src="full_prototype.png" alt="After: VetAnaLog digital interface">
+        </div>
+        <div class="matters-stats">
+          <div class="matters-stats-row">
+            <span class="label">Anaesthesias/year (Tierspital)</span>
+            <span class="value">~4,650</span>
+          </div>
+          <div class="matters-stats-row">
+            <span class="label">Manual records → automated</span>
+            <span class="value">85%</span>
+          </div>
+          <div class="matters-stats-row">
+            <span class="label">Records eliminated per year</span>
+            <span class="value">111k</span>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ── Roadmap ─────────────────────────────────────── -->
-  <section id="roadmap" style="background:var(--bg-subtle);">
-    <div class="container">
-      <div class="section-header centered">
-        <span class="section-eyebrow">Roadmap</span>
-        <h2 class="section-title">The groundwork is laid. Now we build.</h2>
-      </div>
-      <div class="container">
-        <figure class="prototype-card primary">
-          <img src="images/full.svg" alt="VetAnaLog full-screen prototype preview" loading="lazy" />
-          <figcaption class="prototype-caption">
-            <div class="prototype-title">Full Prototype</div>
-            <div class="prototype-note">Desktop view of the main logging workflow, ready for pilot feedback.</div>
-          </figcaption>
-        </figure>
-      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;max-width:900px;margin:0 auto;" class="roadmap-grid">
-        <div style="text-align:center;padding:2rem 1rem;">
-          <div style="color:var(--teal);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;">Now</div>
-          <div style="font-weight:700;margin-bottom:0.5rem;font-size:1rem;">GE Integration</div>
-          <div style="font-size:0.85rem;color:var(--muted);">Interface analysis with GE Healthcare underway</div>
+      <div class="matters-right">
+        <div class="matters-point">
+          <h3>⏱️ Time & cost savings — today</h3>
+          <p>Eliminate hours of post-op transcription. Reduce documentation burden. Give vets their time back.</p>
         </div>
-        <div style="text-align:center;padding:2rem 1rem;">
-          <div style="color:var(--teal);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;">Summer 2025</div>
-          <div style="font-weight:700;margin-bottom:0.5rem;font-size:1rem;">Initial Prototype</div>
-          <div style="font-size:0.85rem;color:var(--muted);">First prototype ready for Tierspital testing</div>
+        <div class="matters-point" style="border-left-color: var(--blue);">
+          <h3>📋 Airtight legal documentation</h3>
+          <p>Every procedure fully traceable, automatically. Zero transcription errors. Complete compliance.</p>
         </div>
-        <div style="text-align:center;padding:2rem 1rem;">
-          <div style="color:var(--teal);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;">Late 2026</div>
-          <div style="font-weight:700;margin-bottom:0.5rem;font-size:1rem;">Pilot Validation</div>
-          <div style="font-size:0.85rem;color:var(--muted);">Full pilot validated at Tierspital Zürich</div>
-        </div>
-        <div style="text-align:center;padding:2rem 1rem;">
-          <div style="color:var(--teal);font-weight:800;font-size:0.78rem;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:0.5rem;">Early 2027</div>
-          <div style="font-weight:700;margin-bottom:0.5rem;font-size:1rem;">Commercial Launch</div>
-          <div style="font-size:0.85rem;color:var(--muted);">DACH-led commercial rollout begins</div>
+        <div class="matters-point" style="border-left-color: #8b5cf6;">
+          <h3>🔮 The dataset that will predict complications</h3>
+          <p>VetAnaLog builds the first high-fidelity structured dataset for veterinary anaesthesia — the foundation for ML models that predict anaesthetic complications before they happen.</p>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- MARKET -->
+<section class="market" id="market">
+  <div class="section-inner">
+    <div class="section-label">Market Opportunity</div>
+    <h2 class="section-title">Where we play</h2>
+    <p class="section-body">A growing, underserved global market — with no purpose-built digital solution currently available.</p>
 
-  <!-- ── Pricing ────────────────────────────────────── -->
-  <section id="pricing">
-    <div class="container">
-      <div class="section-header centered">
-        <span class="section-eyebrow">Pricing</span>
-        <h2 class="section-title">Simple, transparent pricing.</h2>
-        <p class="section-body">One-time implementation fee, then a simple annual SaaS subscription — built for every clinic, from solo practice to university hospital.</p>
+    <div class="market-funnel">
+      <div class="market-tier tam">
+        <div class="market-tier-label">TAM — Total Market</div>
+        <div class="market-tier-value">€1B</div>
+        <div class="market-tier-desc">~180,000 anaesthesia-active vet clinics worldwide</div>
       </div>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <div class="pricing-tier">Standard</div>
-          <div class="pricing-price gradient-text">CHF 125</div>
-          <div class="pricing-period">per month · billed annually</div>
-          <div class="pricing-desc">Ideal for independent and smaller veterinary practices.</div>
-          <ul class="pricing-features">
-            <li>Automatic vital capture</li>
-            <li>Two-tap medication logging</li>
-            <li>AI-drafted anaesthesia reports</li>
-            <li>All species support</li>
-            <li>Audit-ready export</li>
-            <li>Email support</li>
-          </ul>
-          <a href="#contact" class="btn-outline" style="width:100%;justify-content:center;">Get Started</a>
+      <div class="market-tier sam">
+        <div class="market-tier-label">SAM — Serviceable Market</div>
+        <div class="market-tier-value">€270M</div>
+        <div class="market-tier-desc">~65k clinics in EU, N. America, Japan, Australia, NZ</div>
+      </div>
+      <div class="market-tier som">
+        <div class="market-tier-label">SOM — Our Target</div>
+        <div class="market-tier-value">€10M</div>
+        <div class="market-tier-desc">~2–3k clinics, DACH-led 5-year rollout</div>
+      </div>
+    </div>
+    <p class="market-cagr">Market growing at <strong>6.1% CAGR (2026–2031)</strong> · Sources: Mordor Intelligence, FVE VetSurvey, AVMA</p>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="section-inner">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">A model that grows with you</h2>
+    <p class="section-body">Simple, transparent pricing for every clinic size. One-time setup, then annual SaaS.</p>
+
+    <div class="pricing-grid">
+      <div class="pricing-card">
+        <div class="pricing-tier">Standard</div>
+        <h3>CHF 125 / month</h3>
+        <p class="pricing-target">Small to mid-size practices</p>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Implementation</span>
+          <span class="pricing-row-value">CHF 1,900</span>
         </div>
-        <div class="pricing-card featured">
-          <div class="featured-label">Most Popular</div>
-          <div class="pricing-tier">Enterprise</div>
-          <div class="pricing-price gradient-text">CHF 800</div>
-          <div class="pricing-period">per month · billed annually</div>
-          <div class="pricing-desc">For large animal hospitals and university clinics.</div>
-          <ul class="pricing-features">
-            <li>Everything in Standard</li>
-            <li>Multi-user & multi-theatre</li>
-            <li>Advanced analytics dashboard</li>
-            <li>Priority integration support</li>
-            <li>Dedicated account manager</li>
-            <li>Research data network access</li>
-          </ul>
-          <a href="#contact" class="btn-primary" style="width:100%;justify-content:center;">Contact Sales</a>
-          <p class="pricing-note">Research data opt-in: share anonymised data, access the full network dataset. The more clinics join, the more valuable it becomes for everyone.</p>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Annual SaaS</span>
+          <span class="pricing-row-value">CHF 1,500/yr</span>
+        </div>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Data setup</span>
+          <span class="pricing-row-value">CHF 900</span>
+        </div>
+        <div class="pricing-row addon">
+          <span class="pricing-row-label">Research data add-on</span>
+          <span class="pricing-row-value">+ CHF 500/yr</span>
+        </div>
+      </div>
+
+      <div class="pricing-card featured">
+        <div class="pricing-badge">University & Hospital</div>
+        <div class="pricing-tier">Enterprise</div>
+        <h3>CHF 800 / month</h3>
+        <p class="pricing-target">University clinics & large hospitals</p>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Implementation</span>
+          <span class="pricing-row-value">CHF 4,800</span>
+        </div>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Annual SaaS</span>
+          <span class="pricing-row-value">CHF 9,600/yr</span>
+        </div>
+        <div class="pricing-row">
+          <span class="pricing-row-label">Data setup</span>
+          <span class="pricing-row-value">CHF 1,800</span>
+        </div>
+        <div class="pricing-row addon">
+          <span class="pricing-row-label">Research data add-on</span>
+          <span class="pricing-row-value">+ CHF 1,200/yr</span>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- TEAM -->
+<section class="team" id="team">
+  <div class="section-inner">
+    <div class="section-label">The Team</div>
+    <h2 class="section-title">Who we are —<br>and why we're right for this</h2>
 
-  <!-- ── Partners ───────────────────────────────────── -->
-  <section id="partners" style="padding:4rem 0;">
-    <div class="container">
-      <div style="text-align:center;margin-bottom:2.5rem;">
-        <span class="section-eyebrow">Partners &amp; Pilot</span>
-        <h2 class="section-title">Trusted from day one.</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <img class="team-photo" src="images/sarah.png" alt="Sarah Meyer">
+        <h3>Sarah Meyer</h3>
+        <div class="role">CEO / CTO</div>
+        <p>Veterinary anaesthesia expert with a passion for technology and innovation. With a background in both clinical veterinary practice and software development / AI, Sarah leads the technical vision for VetAnaLog.</p>
       </div>
-      <div class="partners-row">
-        <div class="partner-badge">
-          <span class="partner-icon">🏥</span>
-          <span>
-            Tierspital Zürich
-            <span class="partner-sub">Pilot partner</span>
-          </span>
-        </div>
-        <div class="partner-badge">
-          <span class="partner-icon">⚕️</span>
-          <span>
-            GE Healthcare
-            <span class="partner-sub">Monitor integration in progress</span>
-          </span>
-        </div>
+      <div class="team-card">
+        <img class="team-photo" src="images/jose.jpeg" alt="José Carreno">
+        <h3>José Carreno</h3>
+        <div class="role">CFO</div>
+        <p>With his higher education in Engineering and his previous experience managing the financial matters of other SME, he will ensure transparent and healthy financial records in the company. Also involved in business modelling, and commercial planning.</p>
       </div>
-    </div>
-  </section>
-
-  <div class="divider"></div>
-
-  <!-- ── Team ───────────────────────────────────────── -->
-  <section id="team">
-    <div class="container">
-      <div class="section-header centered">
-        <span class="section-eyebrow">Our Team</span>
-        <h2 class="section-title">Built by someone who lived the problem.</h2>
-        <p class="section-body">VetAnaLog was founded by a veterinarian who experienced the paper problem firsthand — then decided to fix it.</p>
+      <div class="team-card">
+        <img class="team-photo" src="images/paulina.png" alt="Paulina Pawlak">
+        <h3>Paulina Pawlak</h3>
+        <div class="role">CSO</div>
+        <p>With her experience in animal biology & physiology, she ensures the data we collect is accurate and usable. Paulina is also in charge of commercial strategy, competitive positioning, and market development.</p>
       </div>
-      <div class="team-grid">
-        <div class="team-card">
-          <div class="team-avatar">SM</div>
-          <div class="team-name">Sarah Meyer</div>
-          <div class="team-role">CEO &amp; CTO</div>
-          <div class="team-bio">Veterinarian turned founder. Sarah built VetAnaLog from firsthand experience performing equine anaesthesia — she knows exactly what's broken and how to fix it.</div>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">J</div>
-          <div class="team-name">José</div>
-          <div class="team-role">CFO &amp; Business Strategy</div>
-          <div class="team-bio">José leads financial planning and business strategy, ensuring VetAnaLog is built to scale from DACH to global markets with a disciplined commercial foundation.</div>
-        </div>
-        <div class="team-card">
-          <div class="team-avatar">P</div>
-          <div class="team-name">Paulina</div>
-          <div class="team-role">Chief Commercial Officer</div>
-          <div class="team-bio">Paulina drives go-to-market strategy and commercial vision — translating clinical insights into compelling value for every clinic in our target market.</div>
-        </div>
+      <div class="team-card">
+        <img class="team-photo" src="images/vicq.png" alt="Vicq the mascot horse">
+        <h3>Vicq</h3>
+        <div class="role">Chief Mascot Officer</div>
+        <p>Reminds us every day why this matters. Has strong opinions about paper protocols.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <div class="divider"></div>
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="section-inner">
+    <div class="section-label">Get In Touch</div>
+    <h2 class="section-title">Let's build the future<br>of vet anaesthesia</h2>
 
-  <!-- ── CTA / Contact ──────────────────────────────── -->
-  <section id="contact">
-    <div class="container">
-      <div class="cta-inner">
-        <span class="section-eyebrow">Get Involved</span>
-        <h2>Let's build the future of veterinary care — together.</h2>
-        <p>
-          We're seeking CHF 75,000 in seed funding and business mentorship from people who've built in this space.
-          We're also welcoming early clinic partners for our 2026 pilot.
-        </p>
-        <div class="cta-actions">
-          <a href="mailto:hello@vetanalog.com" class="btn-primary">
-            Contact Us
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-              <path d="M2 4l6 5 6-5M2 4h12v8a1 1 0 01-1 1H3a1 1 0 01-1-1V4z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-          <a href="mailto:hello@vetanalog.com" class="contact-email">
-            hello@vetanalog.com
-          </a>
+    <div class="contact-inner">
+      <div>
+        <p class="contact-text">Whether you're a vet clinic interested in piloting VetAnaLog, an investor, a potential mentor, or just curious — we'd love to hear from you.</p>
+        <div class="contact-info">
+          <div class="contact-info-item">
+            📧 <a href="mailto:vetanalog@gmail.com">vetanalog@gmail.com</a>
+          </div>
+          <div class="contact-info-item">
+            📍 Zürich, Switzerland
+          </div>
+          <div class="contact-info-item">
+            🎓 Based at the University of Zurich, Tierspital
+          </div>
+        </div>
+        <div class="inno-badge">
+          <div class="inno-dot"></div>
+          Proud participants of the Innosuisse Business Concept Programme.
         </div>
       </div>
+
+      <form class="contact-form" action="https://formspree.io/f/mykokvzd" method="POST">
+        <input type="text" name="name" placeholder="Your name" required>
+        <input type="email" name="email" placeholder="Your email" required>
+        <input type="text" name="organisation" placeholder="Organisation / clinic (optional)">
+        <textarea name="message" placeholder="Your message or interest..."></textarea>
+        <button type="submit">Send message →</button>
+      </form>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- ── Footer ─────────────────────────────────────── -->
-  <footer>
-    <div class="container">
-      <div class="footer-inner">
-        <div class="footer-brand">
-          <a class="footer-logo" href="#hero">Vet<span>Ana</span>Log</a>
-          <div class="footer-tagline">Veterinary anaesthesia logging — and yes, the irony is intentional.</div>
-        </div>
-        <div class="footer-links">
-          <a href="#problem">Problem</a>
-          <a href="#solution">Solution</a>
-          <a href="#pricing">Pricing</a>
-          <a href="#team">Team</a>
-          <a href="#contact">Contact</a>
-        </div>
-      </div>
-      <div class="footer-copy">
-        <span>&copy; 2025 VetAnaLog. All rights reserved.</span>
-        <div class="footer-pilot">
-          <span class="pill">Pilot 2026</span>
-          Tierspital Zürich · GE Healthcare integration in progress
-        </div>
-      </div>
-    </div>
-  </footer>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Vet<span>Ana</span>Log</div>
+  <div class="footer-copy">© 2026 VetAnaLog · Zürich, Switzerland · vetanalog@gmail.com</div>
+</footer>
 
-  <!-- ── Scripts ────────────────────────────────────── -->
-  <script>
-    // Sticky nav background on scroll
-    const nav = document.getElementById('nav');
-    window.addEventListener('scroll', () => {
-      nav.classList.toggle('scrolled', window.scrollY > 40);
-    }, { passive: true });
+<script>
+  function handleSubmit(e) {
+    e.preventDefault();
+    const btn = e.target.querySelector('button');
+    btn.textContent = 'Message sent! ✓';
+    btn.style.background = '#1d9e75';
+    btn.disabled = true;
+  }
 
-    // Mobile nav toggle
-    const mobileBtn = document.getElementById('mobile-btn');
-    const navLinks  = document.getElementById('nav-links');
-    mobileBtn.addEventListener('click', () => {
-      navLinks.classList.toggle('open');
+  // Smooth scroll for nav
+  document.querySelectorAll('a[href^="#"]').forEach(a => {
+    a.addEventListener('click', e => {
+      e.preventDefault();
+      const target = document.querySelector(a.getAttribute('href'));
+      if (target) target.scrollIntoView({ behavior: 'smooth' });
     });
+  });
 
-    // Close mobile nav when a link is clicked
-    navLinks.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => navLinks.classList.remove('open'));
-    });
-
-    // Roadmap grid responsive tweak
-    const roadmapGrid = document.querySelector('.roadmap-grid');
-    function setRoadmapCols() {
-      if (!roadmapGrid) return;
-      roadmapGrid.style.gridTemplateColumns = window.innerWidth < 640 ? '1fr 1fr' : 'repeat(4, 1fr)';
-    }
-    window.addEventListener('resize', setRoadmapCols, { passive: true });
-    setRoadmapCols();
-
-    // Animate numbers when section enters viewport
-    function animateNum(el) {
-      const text = el.textContent;
-      const match = text.match(/^([\d,.]+)/);
-      if (!match) return;
-      const target = parseFloat(match[1].replace(/,/g, ''));
-      const suffix = text.slice(match[1].length);
-      const prefix = text.slice(0, text.indexOf(match[1]));
-      let start = null;
-      const duration = 1200;
-      function step(ts) {
-        if (!start) start = ts;
-        const progress = Math.min((ts - start) / duration, 1);
-        const eased = 1 - Math.pow(1 - progress, 3);
-        const current = Math.round(target * eased);
-        el.textContent = prefix + (current >= 1000 ? current.toLocaleString() : current) + suffix;
-        if (progress < 1) requestAnimationFrame(step);
-      }
-      requestAnimationFrame(step);
-    }
-
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelectorAll('.impact-num').forEach(animateNum);
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    const impactSection = document.getElementById('impact');
-    if (impactSection) observer.observe(impactSection);
-  </script>
-
+  // Nav background on scroll
+  const nav = document.querySelector('nav');
+  window.addEventListener('scroll', () => {
+    nav.style.background = window.scrollY > 50
+      ? 'rgba(10, 22, 40, 0.98)'
+      : 'rgba(10, 22, 40, 0.95)';
+  });
+</script>
 </body>
 </html>
